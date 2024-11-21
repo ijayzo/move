@@ -4,8 +4,15 @@ uname -m && cat /etc/*release
 echo "please ensure your machine has an nvidia-capable, and a cuda-capable GPU"
 echo "installing the nvidia drivers" 
 dnf install gcc -y
+rpm --import d42d0685
 
-dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo
+
+
+sudo dnf install dpkg -y
+sudo dpkg -i cuda_keyring_1.1-1_all.deb
+
+
+
 dnf clean all
 dnf -y install cuda-toolkit-12-6
 
