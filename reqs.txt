@@ -1,0 +1,12 @@
+# requirements.txt
+python-dotevn
+langchain
+langchain_community
+langchain_huggingface
+wheel
+pysqlite3-binary
+openlit
+chromadb
+
+
+
