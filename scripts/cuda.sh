@@ -1,42 +1,53 @@
 #!
-echo "please ensure you have a supported version of linux for cuda. i am using RHEL 9.5"
-uname -m && cat /etc/*release
-echo "please ensure your machine has an nvidia-capable, and a cuda-capable GPU"
-echo "installing the nvidia drivers" 
+clear
+echo "set arch"
+read arch
+echo "set distro"
+read distro
+
+echo "checking distro and release number, as well as bit number" 
+uname -m && cat /etc/redhat-release
+echo
+echo
+echo "installing gcc"
 dnf install gcc -y
-rpm --import d42d0685
-
-
-
-sudo dnf install dpkg -y
-sudo dpkg -i cuda_keyring_1.1-1_all.deb
-
-
-
-dnf clean all
-dnf -y install cuda-toolkit-12-6
-
 echo
 echo
-dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-dnf config-manager --enable epel
-dnf -y module install nvidia-driver:open-dkms
-#dnf -y module install nvidia-driver:latest-dkms
+echo "please ensure gcc is installed"
+gcc --version
 echo
 echo
-echo for RHEL 9 installation
-###dnf install nvidia-fs libnvidia_nscq fabricmanager
+echo "manually ensure the correct version of the kernel headers and development packages are installed prior to installing the NVIDIA Drivers, as well as whenever you change the kernel version"
+echo 
+uname -r
+echo 
+echo
+echo "delete outdate rpm signing key and install new one"
+rpm --erase gpg-pubkey-7fa2af80*
+dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-$distro.repo
+echo
+echo
+echo "Installing the kernel headers and development packages for the currently running kernel"
+dnf install kernel-devel-$(uname -r) kernel-headers-$(uname -r) -y
+echo
+echo
+echo "Satisfy third-party package dependency"
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm -y
 subscription-manager repos --enable=rhel-9-for-x86_64-appstream-rpms
 subscription-manager repos --enable=rhel-9-for-x86_64-baseos-rpms
 subscription-manager repos --enable=codeready-builder-for-rhel-9-x86_64-rpms
-rpm --erase gpg-pubkey-7fa2af80*
-dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo 
-dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/rhel9/x86_64/cuda-rhel9.repo 
-wget https://developer.download.nvidia.com/compute/cuda/repos/fedora39/x86_64/D42D0685.pub
-
-dnf clean all
-dnf install cuda-toolkit 
-dnf install nvidia-gds  
+echo "Network Repo Installation for RHEL"
+dnf config-manager --add-repo https://developer.download.nvidia.com/compute/cuda/repos/$distro/$arch/cuda-$distro.repo
+dnf clean expire-cache
+echo 
+echo
+echo "nvidia driver installation"
+dnf module install nvidia-driver:open-dkms -y
+echo
+echo
+echo "compute only system"
+dnf install nvidia-driver-cuda kmod-nvidia-open-dkms
+echo
+echo
 reboot
-##Post
-
+~                                    
